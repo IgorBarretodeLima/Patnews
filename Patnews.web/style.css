@@ -1,0 +1,277 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
+    color: white;
+    padding: 2.5rem 0;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    font-size: 2.4rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+header p {
+    font-size: 1.1rem;
+    color: #93c5fd;
+}
+
+/* NAVEGAÇÃO POR ABAS */
+.nav-tabs {
+    background-color: #1e293b;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.nav-container {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+    color: #38bdf8;
+    border-bottom-color: #38bdf8;
+}
+
+/* CONTEÚDO DAS ABAS */
+main {
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* CARDS */
+.card {
+    background: #ffffff;
+    padding: 2rem;
+    margin-bottom: 1.8rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.card h2 {
+    color: #1e3a8a;
+    font-size: 1.5rem;
+    margin-bottom: 1.2rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+}
+
+.sub-title {
+    color: #0f172a;
+    font-size: 1.2rem;
+    margin: 1.5rem 0 0.8rem 0;
+}
+
+/* LISTAS E CARDS DE GRID */
+.styled-list {
+    margin-left: 1.2rem;
+}
+
+.styled-list li {
+    margin-bottom: 0.6rem;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.info-box {
+    background: #f1f5f9;
+    padding: 1.2rem;
+    border-radius: 8px;
+    border-left: 4px solid #2563eb;
+}
+
+.info-box h3 {
+    font-size: 1.1rem;
+    color: #1e3a8a;
+    margin-bottom: 0.4rem;
+}
+
+.normas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.norma-item {
+    background: #f8fafc;
+    padding: 1.2rem;
+    border-left: 4px solid #0284c7;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.norma-item h3 {
+    color: #0284c7;
+    margin-bottom: 0.4rem;
+}
+
+/* TABELAS */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+}
+
+.data-table th, .data-table td {
+    padding: 0.8rem 1rem;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #1e293b;
+    color: #ffffff;
+}
+
+.data-table tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+/* ACORDEÃO PARA QUERIES */
+.accordion-item {
+    margin-bottom: 0.8rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.accordion-btn {
+    width: 100%;
+    background: #f1f5f9;
+    border: none;
+    padding: 1rem;
+    text-align: left;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.accordion-btn:hover {
+    background: #e2e8f0;
+}
+
+.accordion-content {
+    display: none;
+    padding: 1rem;
+    background: #0f172a;
+    color: #38bdf8;
+}
+
+.accordion-content.active {
+    display: block;
+}
+
+pre {
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* BOTÕES E PAINEL CLOUD */
+button#btnConnect {
+    background-color: #16a34a;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+button#btnConnect:hover {
+    background-color: #15803d;
+}
+
+.status-box {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f1f5f9;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+
+.note {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 1.8rem 0;
+    background-color: #0f172a;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
