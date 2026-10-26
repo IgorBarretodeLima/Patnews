@@ -2,8 +2,6 @@
 # 📦 PatNews Systems — Gestão de Patrimônio Corporativo
 
 ![MySQL](https://img.shields.io/badge/MySQL-8.0+-00758F?style=for-the-badge&logo=mysql&logoColor=white)
-![Aiven Cloud](https://img.shields.io/badge/Aiven-Cloud-FF4F00?style=for-the-badge&logo=aiven&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![License](https://img.shields.io/badge/License-MIT-green.style=for-the-badge)
 
 > **Sistema corporativo de alto desempenho** para centralização, controle do ciclo de vida de ativos, alocações de custódia, histórico de manutenções e depreciação contábil com estrita integridade relacional.
