@@ -1,0 +1,183 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f1f5f9;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background: linear-gradient(135deg, #0f172a, #1e3a8a);
+    color: white;
+    padding: 2.8rem 0;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+header h1 {
+    font-size: 2.3rem;
+    margin-bottom: 0.4rem;
+}
+
+main {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background: #ffffff;
+    padding: 2rem;
+    margin-bottom: 1.8rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card h2 {
+    color: #2563eb;
+    margin-bottom: 1.2rem;
+    font-size: 1.45rem;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.5rem;
+}
+
+/* API Endpoints Grid */
+.api-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.api-endpoint {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 5px solid #2563eb;
+    padding: 1rem;
+    border-radius: 6px;
+}
+
+.api-endpoint code {
+    font-weight: bold;
+    color: #0f172a;
+    font-size: 1.05rem;
+    margin-left: 0.5rem;
+}
+
+.badge {
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: white;
+}
+
+.badge.get { background-color: #16a34a; }
+.badge.post { background-color: #2563eb; }
+.badge.put { background-color: #d97706; }
+.badge.delete { background-color: #dc2626; }
+
+/* Botões */
+.button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-bottom: 1.2rem;
+}
+
+button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.2rem;
+    font-size: 0.92rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Console JSON Interativo */
+.console-box {
+    background-color: #0f172a;
+    color: #38bdf8;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.console-header {
+    background-color: #1e293b;
+    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+.dot.red { background-color: #ef4444; }
+.dot.yellow { background-color: #f59e0b; }
+.dot.green { background-color: #10b981; }
+
+.console-title {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+    font-family: monospace;
+}
+
+pre {
+    padding: 1.2rem;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+/* Normalização */
+.normas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.norma-item {
+    background: #f8fafc;
+    padding: 1rem;
+    border-left: 4px solid #2563eb;
+    border-radius: 4px;
+}
+
+.norma-item h3 {
+    color: #2563eb;
+    margin-bottom: 0.3rem;
+}
+
+footer {
+    text-align: center;
+    padding: 1.8rem 0;
+    background-color: #0f172a;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}

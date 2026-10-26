@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PatNews Systems - Gestão Patrimonial Corporativa</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e3a8a',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        code, pre, .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid #60a5fa;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        /* Custom scrollbar for JSON viewer */
+        pre::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        pre::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        pre::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 flex flex-col md:flex-row antialiased bg-slate-50">
+
+    <!-- Mobile Header -->
+    <div class="md:hidden bg-brand-900 text-white flex justify-between items-center p-4 sticky top-0 z-50 border-b border-slate-800">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-boxes-stacked text-blue-400 text-xl"></i>
+            <span class="font-bold text-lg tracking-wide">PatNews Systems</span>
+        </div>
+        <button id="mobileMenuBtn" class="text-slate-300 hover:text-white p-2">
+            <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="hidden md:flex flex-col w-full md:w-64 bg-brand-900 text-slate-300 min-h-screen flex-shrink-0 transition-all duration-300 z-40 fixed md:relative top-0 left-0 h-full">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600/30 p-2 rounded-lg text-blue-400 border border-blue-500/30">
+                    <i class="fa-solid fa-boxes-stacked text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-white tracking-wide text-base">PatNews Systems</h1>
+                    <p class="text-xs text-slate-400">RESTful Asset Management</p>
+                </div>
+            </div>
+            <button id="closeMobileMenu" class="md:hidden text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 px-3 py-6 space-y-1">
+            <a href="#overview" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition group" data-page="overview">
+                <i class="fa-solid fa-chart-line text-slate-400 group-hover:text-blue-400 w-5"></i>
+                <span>Visão Geral & API</span>
+            </a>
+
+            <a href="#ativos" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition group" data-page="ativos">
+                <i class="fa-solid fa-laptop-house text-slate-400 group-hover:text-blue-400 w-5"></i>
+                <div class="flex-1 flex justify-between items-center">
+                    <span>Ativos</span>
+                    <span id="navAtivosCount" class="text-xs bg-slate-800 text-blue-400 px-2 py-0.5 rounded-full font-mono">0</span>
+                </div>
+            </a>
+
+            <a href="#manutencoes" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition group" data-page="manutencoes">
+                <i class="fa-solid fa-wrench text-slate-400 group-hover:text-blue-400 w-5"></i>
+                <div class="flex-1 flex justify-between items-center">
+                    <span>Manutenções</span>
+                    <span id="navManutCount" class="text-xs bg-slate-800 text-amber-400 px-2 py-0.5 rounded-full font-mono">0</span>
+                </div>
+            </a>
+
+            <a href="#relatorios" class="nav-link flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/60 hover:text-white transition group" data-page="relatorios">
+                <i class="fa-solid fa-calculator text-slate-400 group-hover:text-blue-400 w-5"></i>
+                <span>Depreciação</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800 bg-slate-950/40 text-xs text-slate-400">
+            <div class="flex items-center space-x-2 mb-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-medium text-slate-300">Aiven MySQL Connected</span>
+            </div>
+            <p>SGBD: MySQL 8.0 (TLS/SSL)</p>
+            <p class="mt-1 text-slate-500">PatNews Systems &copy; 2026</p>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+
+        <!-- Top Status Bar -->
+        <header class="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center gap-4 sticky top-0 z-30 shadow-sm">
+            <div class="flex items-center space-x-3">
+                <h2 id="currentPageTitle" class="text-xl font-bold text-slate-800">Visão Geral & API</h2>
+                <span id="currentPageBadge" class="bg-blue-50 text-blue-700 text-xs px-2.5 py-1 rounded-md font-mono border border-blue-200">GET /api/v1/status</span>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <button onclick="window.openModal('ativoModal')" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition shadow-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Novo Ativo</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Pages Container -->
+        <div class="p-4 md:p-8 flex-1 max-w-7xl w-full mx-auto space-y-8">
+
+            <!-- PAGE 1: OVERVIEW & API SIMULATOR -->
+            <section id="page-overview" class="page-content space-y-8">
+                <!-- Banner -->
+                <div class="bg-gradient-to-r from-brand-900 via-brand-800 to-blue-900 rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden">
+                    <div class="relative z-10 max-w-3xl space-y-3">
+                        <span class="inline-block bg-blue-500/20 text-blue-300 border border-blue-400/30 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">SGBD Cloud & REST API</span>
+                        <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight">PatNews Systems</h2>
+                        <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+                            Plataforma corporativa centralizada para controle completo do ciclo de vida dos bens da empresa (TI, mobiliário, veículos e maquinários). Substitui planilhas manuais por integridade relacional com backend em nuvem.
+                        </p>
+                    </div>
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-9xl pointer-events-none">
+                        <i class="fa-solid fa-server"></i>
+                    </div>
+                </div>
+
+                <!-- API Endpoints Grid -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                                <i class="fa-solid fa-network-wired text-blue-600"></i>
+                                <span>2. Arquitetura da API RESTful</span>
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-1">Endpoints documentados operando com respostas em JSON padronizado.</p>
+                        </div>
+                        <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono">Base: /api/v1</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 border-l-4 border-l-emerald-500 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded font-mono">GET</span>
+                                    <code class="text-sm font-semibold text-slate-800">/api/v1/status</code>
+                                </div>
+                                <p class="text-xs text-slate-600">Verifica a integridade da conexão com a instância MySQL na Aiven Cloud Platform.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 border-l-4 border-l-blue-500 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded font-mono">GET</span>
+                                    <code class="text-sm font-semibold text-slate-800">/api/v1/ativos</code>
+                                </div>
+                                <p class="text-xs text-slate-600">Lista o inventário patrimonial consolidando categorias, departamentos e responsáveis em tempo real.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 border-l-4 border-l-indigo-500 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="bg-indigo-600 text-white text-xs font-bold px-2 py-0.5 rounded font-mono">POST</span>
+                                    <code class="text-sm font-semibold text-slate-800">/api/v1/ativos</code>
+                                </div>
+                                <p class="text-xs text-slate-600">Cadastra um novo ativo com verificação obrigatória da restrição UNIQUE no tombamento.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 border-l-4 border-l-amber-500 flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded font-mono">GET</span>
+                                    <code class="text-sm font-semibold text-slate-800">/api/v1/manutencoes</code>
+                                </div>
+                                <p class="text-xs text-slate-600">Retorna o histórico detalhado de reparos corretivos/preventivos e custos acumulados.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-slate-50 border border-slate-200 border-l-4 border-l-purple-500 flex flex-col justify-between md:col-span-2">
+                            <div>
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded font-mono">GET</span>
+                                    <code class="text-sm font-semibold text-slate-800">/api/v1/relatorios/depreciacao</code>
+                                </div>
+                                <p class="text-xs text-slate-600">Executa o cálculo de valor residual e taxa de depreciação contábil por categoria de ativo.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive API Console -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-terminal text-blue-600"></i>
+                            <span>3. Teste Interativo da API (Simulador JSON)</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">Selecione uma requisição abaixo para executar uma consulta simulada em tempo real:</p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button onclick="testarAPI('status')" class="px-3.5 py-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-semibold text-xs rounded-lg border border-slate-200 transition flex items-center space-x-2">
+                            <span class="bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded">GET</span>
+                            <span>/status</span>
+                        </button>
+                        <button onclick="testarAPI('ativos')" class="px-3.5 py-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-semibold text-xs rounded-lg border border-slate-200 transition flex items-center space-x-2">
+                            <span class="bg-blue-600 text-white text-[10px] px-1.5 py-0.5 rounded">GET</span>
+                            <span>/ativos</span>
+                        </button>
+                        <button onclick="testarAPI('manutencoes')" class="px-3.5 py-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-semibold text-xs rounded-lg border border-slate-200 transition flex items-center space-x-2">
+                            <span class="bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded">GET</span>
+                            <span>/manutencoes</span>
+                        </button>
+                        <button onclick="testarAPI('depreciacao')" class="px-3.5 py-2 bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 font-semibold text-xs rounded-lg border border-slate-200 transition flex items-center space-x-2">
+                            <span class="bg-purple-600 text-white text-[10px] px-1.5 py-0.5 rounded">GET</span>
+                            <span>/relatorios/depreciacao</span>
+                        </button>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-xl overflow-hidden shadow-lg border border-slate-800 mt-4">
+                        <div class="bg-slate-800 px-4 py-3 flex items-center justify-between border-b border-slate-700">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                                <span id="endpointLabel" class="text-xs text-slate-400 font-mono ml-2">Console da API HTTP</span>
+                            </div>
+                            <button onclick="copyConsoleJson()" class="text-xs text-slate-400 hover:text-white transition flex items-center space-x-1">
+                                <i class="fa-regular fa-copy"></i>
+                                <span>Copiar</span>
+                            </button>
+                        </div>
+                        <pre class="p-4 text-xs md:text-sm text-sky-400 overflow-x-auto min-h-[220px] max-h-[380px]"><code id="jsonViewer">// Selecione um endpoint acima para visualizar o retorno JSON em tempo real...</code></pre>
+                    </div>
+                </div>
+
+                <!-- Database Normalization Section -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2 mb-4">
+                        <i class="fa-solid fa-database text-blue-600"></i>
+                        <span>4. Normalização Aplicada (1FN a 4FN)</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="p-4 rounded-lg bg-slate-50 border-l-4 border-blue-600">
+                            <h4 class="font-bold text-blue-600 text-sm mb-1">1FN (Primeira Forma)</h4>
+                            <p class="text-xs text-slate-600">Atributos atômicos e indivisíveis. Remoção de listas repetitivas de equipamentos por departamento.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-50 border-l-4 border-indigo-600">
+                            <h4 class="font-bold text-indigo-600 text-sm mb-1">2FN (Segunda Forma)</h4>
+                            <p class="text-xs text-slate-600">Dependência funcional total na chave composta da associativa <code>Ativos_Fornecedores</code>.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-50 border-l-4 border-cyan-600">
+                            <h4 class="font-bold text-cyan-600 text-sm mb-1">3FN (Terceira Forma)</h4>
+                            <p class="text-xs text-slate-600">Eliminação de dependências transitivas. Taxa de depreciação isolada na tabela <code>Categorias</code>.</p>
+                        </div>
+                        <div class="p-4 rounded-lg bg-slate-50 border-l-4 border-emerald-600">
+                            <h4 class="font-bold text-emerald-600 text-sm mb-1">4FN (Quarta Forma)</h4>
+                            <p class="text-xs text-slate-600">Isolamento de dependências multivaloradas. Histórico de <code>Manutencoes</code> em entidade própria.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 2: ATIVOS (INVENTORY) -->
+            <section id="page-ativos" class="page-content hidden space-y-6">
+                <!-- Metrics Bar -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total de Ativos</p>
+                            <h3 id="statTotalAtivos" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Valor do Inventário</p>
+                            <h3 id="statValorTotal" class="text-2xl font-bold text-emerald-600 mt-1">R$ 0,00</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Em Manutenção</p>
+                            <h3 id="statEmManutencao" class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters & Controls -->
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center justify-between">
+                    <div class="flex-1 min-w-[240px]">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="filterAtivoSearch" oninput="renderAtivosTable()" placeholder="Buscar por nome ou tombamento (PAT-00...)" class="w-full pl-9 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                        <select id="filterAtivoCategoria" onchange="renderAtivosTable()" class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-700 outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todas as Categorias</option>
+                            <option value="Equipamentos de TI">Equipamentos de TI</option>
+                            <option value="Veículos">Veículos</option>
+                            <option value="Mobiliário">Mobiliário</option>
+                        </select>
+
+                        <select id="filterAtivoStatus" onchange="renderAtivosTable()" class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white text-slate-700 outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todos os Status</option>
+                            <option value="Em Uso">Em Uso</option>
+                            <option value="Em Manutenção">Em Manutenção</option>
+                            <option value="Baixado">Baixado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Ativos Table -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider">
+                                    <th class="py-3.5 px-4 font-semibold">Tombamento</th>
+                                    <th class="py-3.5 px-4 font-semibold">Ativo / Equipamento</th>
+                                    <th class="py-3.5 px-4 font-semibold">Categoria</th>
+                                    <th class="py-3.5 px-4 font-semibold">Departamento</th>
+                                    <th class="py-3.5 px-4 font-semibold">Responsável</th>
+                                    <th class="py-3.5 px-4 font-semibold">Status</th>
+                                    <th class="py-3.5 px-4 font-semibold text-right">Valor Aquisição</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ativosTableBody" class="divide-y divide-slate-100 text-sm">
+                                <!-- JS Populated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 3: MANUTENÇÕES (SERVICE ORDERS) -->
+            <section id="page-manutencoes" class="page-content hidden space-y-6">
+                <!-- Metrics -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total de Chamados</p>
+                            <h3 id="statTotalManut" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Custo Acumulado em Reparos</p>
+                            <h3 id="statCustoManut" class="text-2xl font-bold text-rose-600 mt-1">R$ 0,00</h3>
+                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-receipt"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-sm font-medium text-slate-600">Filtrar por Tipo:</span>
+                        <select id="filterManutTipo" onchange="renderManutencoesTimeline()" class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm bg-white text-slate-700 outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Todos os Tipos</option>
+                            <option value="Corretiva">Corretiva</option>
+                            <option value="Preventiva">Preventiva</option>
+                        </select>
+                    </div>
+
+                    <span class="text-xs text-slate-400 font-mono">Tabela 4FN: Isolation Manutencoes</span>
+                </div>
+
+                <!-- Timeline / List -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+                    <div id="manutTimeline" class="space-y-6 relative before:absolute before:inset-0 before:left-5 before:w-0.5 before:bg-slate-200">
+                        <!-- JS Populated -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- PAGE 4: DEPRECIAÇÃO (REPORTS & CALCULATOR) -->
+            <section id="page-relatorios" class="page-content hidden space-y-6">
+                <!-- Visual Depreciation Progress -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800">Demonstrativo de Depreciação por Categoria</h3>
+                        <p class="text-xs text-slate-500">Cálculo contábil de valor residual e desgaste de ativos (3FN).</p>
+                    </div>
+
+                    <div id="depreciationBarsContainer" class="space-y-6 pt-2">
+                        <!-- JS Populated -->
+                    </div>
+                </div>
+
+                <!-- Interactive Depreciation Calculator -->
+                <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200 space-y-6">
+                    <div class="border-b border-slate-200 pb-4">
+                        <h3 class="text-lg font-bold text-slate-800 flex items-center space-x-2">
+                            <i class="fa-solid fa-calculator text-blue-600"></i>
+                            <span>Calculadora de Valor Residual e Depreciação</span>
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">Simule o valor contábil residual do bem após determinado período de uso.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Valor Original do Ativo (R$)</label>
+                                <input type="number" id="calcValorOriginal" value="10000" step="500" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Anos de Uso Decorridos</label>
+                                <input type="number" id="calcAnosUso" value="3" min="0" max="20" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Taxa de Depreciação Anual (%)</label>
+                                <select id="calcTaxaAnual" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="20">20% a.a. (Equipamentos de TI - 5 anos)</option>
+                                    <option value="20">20% a.a. (Veículos - 5 anos)</option>
+                                    <option value="10">10% a.a. (Mobiliário - 10 anos)</option>
+                                </select>
+                            </div>
+
+                            <button onclick="calcularDepreciacaoSimulada()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition">
+                                Calcular Depreciação
+                            </button>
+                        </div>
+
+                        <!-- Result Display -->
+                        <div class="md:col-span-2 bg-slate-900 text-white rounded-xl p-6 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Resultado da Simulação</span>
+                                <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
+                                        <p class="text-xs text-slate-400">Depreciação Acumulada</p>
+                                        <h4 id="calcResultDeprec" class="text-xl font-bold text-amber-400 mt-1">R$ 6.000,00</h4>
+                                    </div>
+                                    <div class="bg-slate-800/80 p-4 rounded-lg border border-slate-700">
+                                        <p class="text-xs text-slate-400">Valor Residual Estimado</p>
+                                        <h4 id="calcResultResidual" class="text-xl font-bold text-emerald-400 mt-1">R$ 4.000,00</h4>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-4 border-t border-slate-800 text-xs text-slate-400">
+                                <p id="calcResumoTexto">O ativo perderá 60,00% do seu valor original ao longo de 3 anos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MODAL: Cadastrar Ativo (POST /api/v1/ativos) -->
+    <div id="ativoModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden transform transition-all">
+            <div class="bg-brand-900 text-white px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="bg-indigo-600 text-white text-[10px] font-bold px-2 py-0.5 rounded font-mono">POST</span>
+                    <h3 class="font-bold text-base">Novo Ativo Patrimonial</h3>
+                </div>
+                <button onclick="window.closeModal('ativoModal')" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="formNovoAtivo" onsubmit="salvarNovoAtivo(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nº Tombamento (UNIQUE)</label>
+                    <input type="text" id="ativoTombamento" required placeholder="Ex: PAT-00103" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none uppercase font-mono">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Nome do Ativo / Equipamento</label>
+                    <input type="text" id="ativoNome" required placeholder="Ex: Monitor UltraWide 34 LG" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Categoria</label>
+                        <select id="ativoCategoria" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="Equipamentos de TI">Equipamentos de TI</option>
+                            <option value="Veículos">Veículos</option>
+                            <option value="Mobiliário">Mobiliário</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Departamento</label>
+                        <input type="text" id="ativoDepto" required placeholder="Ex: TI / RH" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Responsável</label>
+                        <input type="text" id="ativoResponsavel" required placeholder="Nome do usuário" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Valor Aquisição (R$)</label>
+                        <input type="number" id="ativoValor" required step="0.01" placeholder="0.00" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end space-x-3 border-t border-slate-100">
+                    <button type="button" onclick="window.closeModal('ativoModal')" class="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition shadow-sm">Cadastrar Ativo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 z-50 border border-slate-700">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toastMsg" class="text-sm">Operação realizada com sucesso!</span>
+    </div>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Database State (In-Memory)
+        const state = {
+            respostasAPI: {
+                status: {
+                    status: "200 OK",
+                    provedor: "Aiven Cloud Platform",
+                    sgbd: "MySQL 8.0",
+                    ssl: true,
+                    banco: "assetcontrol_db",
+                    tempoRespostaMs: 24,
+                    mensagem: "✓ Conexão ativa e estável com integridade de dados garantida."
+                },
+                ativos: [
+                    {
+                        num_tombamento: "PAT-00101",
+                        nome_ativo: "Notebook Dell Latitude 5420",
+                        categoria: "Equipamentos de TI",
+                        responsavel: "Carlos Eduardo",
+                        departamento: "Tecnologia da Informação",
+                        status: "Em Uso",
+                        valor_aquisicao: 5500.00
+                    },
+                    {
+                        num_tombamento: "PAT-00102",
+                        nome_ativo: "Servidor Dell PowerEdge R740",
+                        categoria: "Equipamentos de TI",
+                        responsavel: "Carlos Eduardo",
+                        departamento: "Tecnologia da Informação",
+                        status: "Em Uso",
+                        valor_aquisicao: 25000.00
+                    },
+                    {
+                        num_tombamento: "PAT-00301",
+                        nome_ativo: "Furgão Renault Master",
+                        categoria: "Veículos",
+                        responsavel: "Fernanda Lima",
+                        departamento: "Logística",
+                        status: "Em Manutenção",
+                        valor_aquisicao: 120000.00
+                    },
+                    {
+                        num_tombamento: "PAT-00201",
+                        nome_ativo: "Cadeira Ergonômica Herman Miller",
+                        categoria: "Mobiliário",
+                        responsavel: "Mariana Souza",
+                        departamento: "Recursos Humanos",
+                        status: "Em Uso",
+                        valor_aquisicao: 8500.00
+                    }
+                ],
+                manutencoes: [
+                    {
+                        id_manutencao: 1,
+                        tombamento: "PAT-00101",
+                        ativo: "Notebook Dell Latitude 5420",
+                        tipo: "Corretiva",
+                        custo: 450.00,
+                        data: "2023-11-10",
+                        descricao: "Troca de tela danificada e teclado"
+                    },
+                    {
+                        id_manutencao: 2,
+                        tombamento: "PAT-00301",
+                        ativo: "Furgão Renault Master",
+                        tipo: "Corretiva",
+                        custo: 3500.00,
+                        data: "2024-01-15",
+                        descricao: "Manutenção preventiva do sistema de freios e óleo"
+                    },
+                    {
+                        id_manutencao: 3,
+                        tombamento: "PAT-00102",
+                        ativo: "Servidor Dell PowerEdge R740",
+                        tipo: "Preventiva",
+                        custo: 1200.00,
+                        data: "2024-03-02",
+                        descricao: "Limpeza física interna e substituição da pasta térmica"
+                    }
+                ],
+                depreciacao: [
+                    {
+                        categoria: "Equipamentos de TI",
+                        taxa_anual: "20.00%",
+                        total_ativos: 2,
+                        valor_original: 30500.00,
+                        depreciacao_acumulada_est: 6100.00
+                    },
+                    {
+                        categoria: "Veículos",
+                        taxa_anual: "20.00%",
+                        total_ativos: 1,
+                        valor_original: 120000.00,
+                        depreciacao_acumulada_est: 24000.00
+                    },
+                    {
+                        categoria: "Mobiliário",
+                        taxa_anual: "10.00%",
+                        total_ativos: 1,
+                        valor_original: 8500.00,
+                        depreciacao_acumulada_est: 850.00
+                    }
+                ]
+            }
+        };
+
+        // Format Currency Helper
+        function formatBRL(val) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+        }
+
+        // SPA Navigation
+        function navigateTo(pageId) {
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            const activePage = document.getElementById(`page-${pageId}`);
+            if (activePage) activePage.classList.remove('hidden');
+
+            // Update Nav styling
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-page') === pageId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // Update Header Title
+            const titles = {
+                'overview': { title: 'Visão Geral & API', badge: 'GET /api/v1/status' },
+                'ativos': { title: 'Inventário de Ativos', badge: 'GET /api/v1/ativos' },
+                'manutencoes': { title: 'Histórico de Manutenções', badge: 'GET /api/v1/manutencoes' },
+                'relatorios': { title: 'Relatórios de Depreciação', badge: 'GET /api/v1/relatorios/depreciacao' }
+            };
+
+            if (titles[pageId]) {
+                document.getElementById('currentPageTitle').innerText = titles[pageId].title;
+                document.getElementById('currentPageBadge').innerText = titles[pageId].badge;
+            }
+
+            // Close mobile menu if open
+            document.getElementById('sidebar').classList.add('hidden');
+        }
+
+        // Render Overview API Simulator
+        function testarAPI(rota) {
+            const label = document.getElementById('endpointLabel');
+            const viewer = document.getElementById('jsonViewer');
+
+            label.innerText = `Requisitando /api/v1/${rota}...`;
+            viewer.style.color = '#94a3b8';
+            viewer.innerText = '// Aguardando resposta do servidor...';
+
+            setTimeout(() => {
+                label.innerText = `HTTP 200 OK — GET /api/v1/${rota}`;
+                viewer.style.color = '#38bdf8';
+                viewer.innerText = JSON.stringify(state.respostasAPI[rota], null, 2);
+            }, 300);
+        }
+
+        function copyConsoleJson() {
+            const viewer = document.getElementById('jsonViewer');
+            navigator.clipboard.writeText(viewer.innerText);
+            showToast('JSON copiado para a área de transferência!');
+        }
+
+        // Render Ativos Table & Stats
+        function renderAtivosTable() {
+            const tbody = document.getElementById('ativosTableBody');
+            const search = document.getElementById('filterAtivoSearch').value.toLowerCase();
+            const catFilter = document.getElementById('filterAtivoCategoria').value;
+            const statusFilter = document.getElementById('filterAtivoStatus').value;
+
+            const filtered = state.respostasAPI.ativos.filter(item => {
+                const matchSearch = item.nome_ativo.toLowerCase().includes(search) || item.num_tombamento.toLowerCase().includes(search);
+                const matchCat = catFilter ? item.categoria === catFilter : true;
+                const matchStatus = statusFilter ? item.status === statusFilter : true;
+                return matchSearch && matchCat && matchStatus;
+            });
+
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-400">Nenhum ativo encontrado para os filtros selecionados.</td></tr>`;
+            } else {
+                filtered.forEach(ativo => {
+                    let statusBadgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+                    if (ativo.status === 'Em Manutenção') statusBadgeClass = 'bg-amber-100 text-amber-800 border-amber-200';
+                    if (ativo.status === 'Baixado') statusBadgeClass = 'bg-slate-100 text-slate-800 border-slate-200';
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-mono text-xs font-bold text-slate-700">${ativo.num_tombamento}</td>
+                        <td class="py-3 px-4 font-semibold text-slate-800">${ativo.nome_ativo}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600"><span class="bg-slate-100 px-2 py-1 rounded border border-slate-200">${ativo.categoria}</span></td>
+                        <td class="py-3 px-4 text-xs text-slate-600">${ativo.departamento}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600">${ativo.responsavel}</td>
+                        <td class="py-3 px-4"><span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${statusBadgeClass}">${ativo.status}</span></td>
+                        <td class="py-3 px-4 text-right font-mono font-semibold text-slate-800">${formatBRL(ativo.valor_aquisicao)}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Update Metrics
+            const totalAtivos = state.respostasAPI.ativos.length;
+            const valorTotal = state.respostasAPI.ativos.reduce((acc, curr) => acc + curr.valor_aquisicao, 0);
+            const emManut = state.respostasAPI.ativos.filter(a => a.status === 'Em Manutenção').length;
+
+            document.getElementById('statTotalAtivos').innerText = totalAtivos;
+            document.getElementById('navAtivosCount').innerText = totalAtivos;
+            document.getElementById('statValorTotal').innerText = formatBRL(valorTotal);
+            document.getElementById('statEmManutencao').innerText = emManut;
+        }
+
+        // Render Manutenções Timeline & Stats
+        function renderManutencoesTimeline() {
+            const container = document.getElementById('manutTimeline');
+            const filterTipo = document.getElementById('filterManutTipo').value;
+
+            const filtered = state.respostasAPI.manutencoes.filter(m => filterTipo ? m.tipo === filterTipo : true);
+
+            container.innerHTML = '';
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 pl-8">Nenhuma manutenção encontrada.</p>`;
+            } else {
+                filtered.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'relative pl-8 group';
+                    div.innerHTML = `
+                        <div class="absolute left-3 top-1.5 -translate-x-1/2 w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-sm group-hover:scale-125 transition"></div>
+                        <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-2">
+                            <div class="flex flex-wrap justify-between items-start gap-2">
+                                <div>
+                                    <span class="text-xs font-mono bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-semibold">${m.tombamento}</span>
+                                    <h4 class="font-bold text-slate-800 text-base mt-1">${m.ativo}</h4>
+                                </div>
+                                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full ${m.tipo === 'Corretiva' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-indigo-100 text-indigo-800 border border-indigo-200'}">${m.tipo}</span>
+                            </div>
+                            <p class="text-xs text-slate-600">${m.descricao}</p>
+                            <div class="flex justify-between items-center pt-2 text-xs text-slate-500 border-t border-slate-200">
+                                <span><i class="fa-regular fa-calendar mr-1"></i> ${m.data}</span>
+                                <span class="font-mono font-bold text-slate-800 text-sm">Custo: ${formatBRL(m.custo)}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            // Update Metrics
+            const totalManut = state.respostasAPI.manutencoes.length;
+            const custoTotal = state.respostasAPI.manutencoes.reduce((acc, curr) => acc + curr.custo, 0);
+
+            document.getElementById('statTotalManut').innerText = totalManut;
+            document.getElementById('navManutCount').innerText = totalManut;
+            document.getElementById('statCustoManut').innerText = formatBRL(custoTotal);
+        }
+
+        // Render Depreciation Reports
+        function renderDepreciationBars() {
+            const container = document.getElementById('depreciationBarsContainer');
+            container.innerHTML = '';
+
+            state.respostasAPI.depreciacao.forEach(item => {
+                const residual = item.valor_original - item.depreciacao_acumulada_est;
+                const percDeprec = Math.min(100, Math.round((item.depreciacao_acumulada_est / item.valor_original) * 100));
+
+                const div = document.createElement('div');
+                div.className = 'space-y-2';
+                div.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold text-slate-700">
+                        <span>${item.categoria} (${item.taxa_anual} a.a.)</span>
+                        <span>Original: ${formatBRL(item.valor_original)} | Residual: ${formatBRL(residual)}</span>
+                    </div>
+                    <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden flex border border-slate-200">
+                        <div class="bg-amber-500 h-full transition-all duration-500" style="width: ${percDeprec}%" title="Depreciação: ${percDeprec}%"></div>
+                        <div class="bg-emerald-500 h-full transition-all duration-500" style="width: ${100 - percDeprec}%" title="Residual: ${100 - percDeprec}%"></div>
+                    </div>
+                    <div class="flex justify-between text-[11px] text-slate-400 font-mono">
+                        <span>Acumulado: ${formatBRL(item.depreciacao_acumulada_est)} (${percDeprec}%)</span>
+                        <span>Ativos: ${item.total_ativos}</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Interactive Depreciation Calculator
+        function calcularDepreciacaoSimulada() {
+            const valorOrig = parseFloat(document.getElementById('calcValorOriginal').value) || 0;
+            const anos = parseInt(document.getElementById('calcAnosUso').value) || 0;
+            const taxa = parseFloat(document.getElementById('calcTaxaAnual').value) || 0;
+
+            const percTotal = Math.min(100, (taxa * anos));
+            const valorDeprec = valorOrig * (percTotal / 100);
+            const valorResidual = Math.max(0, valorOrig - valorDeprec);
+
+            document.getElementById('calcResultDeprec').innerText = formatBRL(valorDeprec);
+            document.getElementById('calcResultResidual').innerText = formatBRL(valorResidual);
+            document.getElementById('calcResumoTexto').innerText = `O ativo perderá ${percTotal.toFixed(2)}% do seu valor original ao longo de ${anos} anos.`;
+        }
+
+        // Add New Asset Form Handler
+        function salvarNovoAtivo(event) {
+            event.preventDefault();
+
+            const tomb = document.getElementById('ativoTombamento').value.toUpperCase();
+            const nome = document.getElementById('ativoNome').value;
+            const cat = document.getElementById('ativoCategoria').value;
+            const depto = document.getElementById('ativoDepto').value;
+            const resp = document.getElementById('ativoResponsavel').value;
+            const valor = parseFloat(document.getElementById('ativoValor').value) || 0;
+
+            // Check UNIQUE constraint simulation
+            const existe = state.respostasAPI.ativos.some(a => a.num_tombamento === tomb);
+            if (existe) {
+                alert(`Erro de Integridade: O tombamento ${tomb} já está cadastrado no sistema (Restrição UNIQUE).`);
+                return;
+            }
+
+            const novoAtivo = {
+                num_tombamento: tomb,
+                nome_ativo: nome,
+                categoria: cat,
+                responsavel: resp,
+                departamento: depto,
+                status: "Em Uso",
+                valor_aquisicao: valor
+            };
+
+            state.respostasAPI.ativos.unshift(novoAtivo);
+
+            // Re-render
+            renderAtivosTable();
+            window.closeModal('ativoModal');
+            showToast(`Ativo ${tomb} cadastrado com sucesso!`);
+            document.getElementById('formNovoAtivo').reset();
+        }
+
+        // Modal Helpers
+        window.openModal = function(id) {
+            document.getElementById(id).classList.remove('hidden');
+        };
+        window.closeModal = function(id) {
+            document.getElementById(id).classList.add('hidden');
+        };
+
+        // Toast Helper
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initializer
+        window.onload = function() {
+            // Router listener
+            window.addEventListener('hashchange', () => {
+                const hash = window.location.hash.replace('#', '') || 'overview';
+                navigateTo(hash);
+            });
+
+            // Mobile Menu Toggle
+            document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('hidden');
+            });
+            document.getElementById('closeMobileMenu').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.add('hidden');
+            });
+
+            // Initial Data Render
+            renderAtivosTable();
+            renderManutencoesTimeline();
+            renderDepreciationBars();
+            calcularDepreciacaoSimulada();
+
+            // Initial Page setup
+            const initialHash = window.location.hash.replace('#', '') || 'overview';
+            navigateTo(initialHash);
+            testarAPI('status');
+        };
+    </script>
+</body>
+</html>
